@@ -53,3 +53,14 @@ div[style*="zIndex"] p,
 div[style*="zIndex"] li {
   color: var(--ifm-font-color-base) !important;
 }
+
+/* Make sure MatrixCanvas doesn't cover sidebar */
+canvas[style*="fixed"] {
+  z-index: 0 !important;
+}
+
+/* Make sure content stays on top */
+.main-wrapper {
+  position: relative;
+  z-index: 1;
+}
