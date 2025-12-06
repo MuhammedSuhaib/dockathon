@@ -54,6 +54,31 @@ div[style*="zIndex"] li {
   color: var(--ifm-font-color-base) !important;
 }
 
+/* Ensure text is readable over MatrixCanvas background */
+div[style*="zIndex"] {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+[data-theme='dark'] div[style*="zIndex"] {
+  background-color: rgba(20, 20, 20, 0.85);
+  color: white;
+}
+
+/* Ensure text color is readable in both themes */
+div[style*="zIndex"] h1,
+div[style*="zIndex"] h2,
+div[style*="zIndex"] h3,
+div[style*="zIndex"] h4,
+div[style*="zIndex"] h5,
+div[style*="zIndex"] h6,
+div[style*="zIndex"] p,
+div[style*="zIndex"] li {
+  color: var(--ifm-font-color-base) !important;
+}
+
 /* Make sure MatrixCanvas doesn't cover sidebar */
 canvas[style*="fixed"] {
   z-index: 0 !important;
@@ -63,4 +88,9 @@ canvas[style*="fixed"] {
 .main-wrapper {
   position: relative;
   z-index: 1;
+}
+
+/* Ensure sidebar stays on top */
+.navbar-sidebar, .sidebar, .menu {
+  z-index: 10000 !important;
 }
