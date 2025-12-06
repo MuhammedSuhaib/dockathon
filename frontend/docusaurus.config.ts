@@ -89,7 +89,7 @@ const config: Config = {
           items: [
             {
               label: 'Robotic Nervous System',
-              to: '/docs/module-01-robotic-nervous-system',
+              to: '/docs/module-01-robotic-nervous-system/intro',
             },
           ],
         },
