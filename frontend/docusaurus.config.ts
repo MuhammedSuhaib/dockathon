@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Embodied Intelligence',
   tagline: 'Physical AI & Humanoid Robotics',
-  favicon: 'img/favicon.ico',
+  favicon: 'https://github.com/MuhammedSuhaib.png',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -18,7 +18,7 @@ const config: Config = {
   url: 'https://Panaversity.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/embodied-intelligence-book/',
+  baseUrl: '/dockathon/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
