@@ -3,7 +3,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 // Import the real ChatKit React library
 // This would be installed via: npm install @openai/chatkit-react
-const { useChatKit, Chat } = typeof window !== 'undefined' ? require('@openai/chatkit-react') : { useChatKit: null, Chat: null };
+const { useChatKit, ChatKit } = typeof window !== 'undefined' ? require('@openai/chatkit-react') : { useChatKit: null, ChatKit: null };
 
 const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded = false }) => {
   const { siteConfig } = useDocusaurusContext();
@@ -56,7 +56,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
   };
 
   // Fallback UI in case ChatKit is not available
-  if (!useChatKit || !Chat) {
+  if (!useChatKit || !ChatKit) {
     return (
       <div style={{
         display: 'flex',
@@ -156,7 +156,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
 
       {/* ChatKit Chat Component */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Chat
+        <ChatKit
           control={control}
           state={state}
           components={{
