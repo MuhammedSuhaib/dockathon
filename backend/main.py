@@ -1,5 +1,5 @@
 """
-Main FastAPI application for the Backend RAG System.
+Main FastAPI application for the Backend RAG System with ChatKit integration.
 """
 import logging
 from contextlib import asynccontextmanager
@@ -18,6 +18,9 @@ from embeddings import EmbeddingService
 from vector_store import VectorStore
 from rag import RAGService, QueryRequest, QueryResponse, SelectionRequest, SelectionResponse
 
+# Import ChatKit API
+from chatkit_api import app as chatkit_app
+
 # Global variable to hold the RAG service instance
 rag_service = None
 
@@ -32,11 +35,11 @@ async def lifespan(app: FastAPI):
     try:
         # Initialize the vector store
         vector_store = VectorStore()
-        
+
         # Initialize the RAG service
         rag_service = RAGService()
         rag_service.set_vector_store(vector_store)
-        
+
         logger.info("Services initialized successfully")
         yield
     except Exception as e:
@@ -46,13 +49,16 @@ async def lifespan(app: FastAPI):
         # Shutdown
         logger.info("Application shutdown")
 
-# Create the FastAPI app with lifespan
+# Create the main FastAPI app with lifespan
 app = FastAPI(
-    title="Backend RAG API",
-    description="API for the Backend RAG System for Physical AI & Humanoid Robotics",
+    title="Backend RAG API with ChatKit",
+    description="API for the Backend RAG System for Physical AI & Humanoid Robotics with ChatKit integration",
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Mount the ChatKit API
+app.mount("/chat", chatkit_app)
 
 # Add logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -64,7 +70,7 @@ class HealthResponse(BaseModel):
 async def health_check():
     """
     Health check endpoint to verify the service is operational.
-    
+
     Returns:
         HealthResponse: Status of the service
     """
@@ -74,17 +80,17 @@ async def health_check():
 async def query_endpoint(request: QueryRequest):
     """
     Query endpoint that processes user questions against the indexed documents.
-    
+
     Args:
         request: QueryRequest containing the user's question
-        
+
     Returns:
         QueryResponse with the answer and source documents
     """
     try:
         if not rag_service:
             raise HTTPException(status_code=500, detail="RAG service not initialized")
-        
+
         # Process the query using the RAG service
         response = rag_service.query(request.query)
         return response
@@ -98,17 +104,17 @@ async def query_endpoint(request: QueryRequest):
 async def selection_endpoint(request: SelectionRequest):
     """
     Selection endpoint that answers questions based only on provided text.
-    
+
     Args:
         request: SelectionRequest containing selected text and question
-        
+
     Returns:
         SelectionResponse with the answer
     """
     try:
         if not rag_service:
             raise HTTPException(status_code=500, detail="RAG service not initialized")
-        
+
         # Process the selection-based request
         response = rag_service.answer_from_selection(request.selected_text, request.question)
         return response
