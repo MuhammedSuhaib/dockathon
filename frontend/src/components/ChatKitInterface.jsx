@@ -44,7 +44,7 @@ class MockChatKit {
   }
 }
 
-const ChatKitInterface = ({ conversationId = 'default-conversation' }) => {
+const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded = false }) => {
   const { siteConfig } = useDocusaurusContext();
   const [messages, setMessages] = useState([
     {
@@ -199,15 +199,16 @@ const ChatKitInterface = ({ conversationId = 'default-conversation' }) => {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      height: '600px',
+      height: isEmbedded ? '400px' : '600px',
       border: '1px solid #00ff41',
       borderRadius: '8px',
       backgroundColor: '#001a0d',
       color: '#00ff41',
       fontFamily: 'monospace',
       overflow: 'hidden',
-      maxWidth: '800px',
-      margin: '20px 0'
+      maxWidth: isEmbedded ? '100%' : '800px',
+      margin: isEmbedded ? '0' : '20px 0',
+      width: isEmbedded ? '100%' : 'auto'
     }}>
       {/* Chat Header */}
       <div style={{

@@ -36,6 +36,7 @@ Implement an AI-powered chatbot interface for the Embodied Intelligence textbook
 - Maintains the Matrix-themed UI design where possible
 - All functionality tested and working
 - Conversation persistence across sessions
+- Available globally via floating chat widget on all pages
 
 ## Clarifications
 
