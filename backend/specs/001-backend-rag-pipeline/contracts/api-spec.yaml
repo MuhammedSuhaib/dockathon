@@ -1,0 +1,147 @@
+openapi: 3.0.0
+info:
+  title: Backend RAG API
+  description: API for the Backend RAG System for Physical AI & Humanoid Robotics
+  version: 1.0.0
+paths:
+  /api/health:
+    get:
+      summary: Health check endpoint
+      description: Verify that the service is running and operational
+      responses:
+        '200':
+          description: Service is operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+        '500':
+          description: Service is not operational
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/query:
+    post:
+      summary: Query the knowledge base
+      description: Submit a question to get an answer based on the indexed documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Successfully processed the query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/selection:
+    post:
+      summary: Answer based on selected text
+      description: Submit selected text and a question to get an answer based only on the provided text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectionRequest'
+      responses:
+        '200':
+          description: Successfully processed the selection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectionResponse'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    QueryRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: The user's question
+          example: "What is the principle of force control in humanoid robotics?"
+    QueryResponse:
+      type: object
+      required:
+        - answer
+      properties:
+        answer:
+          type: string
+          description: The generated answer based on retrieved context
+          example: "Force control in humanoid robotics involves..."
+        sources:
+          type: array
+          items:
+            type: string
+          description: List of source documents that informed the answer
+          example: ["/docs/introduction.md", "/docs/force-control.md"]
+    SelectionRequest:
+      type: object
+      required:
+        - selected_text
+        - question
+      properties:
+        selected_text:
+          type: string
+          description: The text selected by the user
+          example: "Force control is a crucial aspect of humanoid robotics. It involves precise manipulation..."
+        question:
+          type: string
+          description: The question about the selected text
+          example: "How does force control work in humanoid robotics?"
+    SelectionResponse:
+      type: object
+      required:
+        - answer
+      properties:
+        answer:
+          type: string
+          description: The generated answer based only on the provided text
+          example: "Based on the selected text, force control works by..."
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Description of the error
+          example: "Invalid request format"
+        details:
+          type: string
+          description: Additional details about the error
+          example: "Query field is required"
