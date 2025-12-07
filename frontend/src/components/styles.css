@@ -1,0 +1,74 @@
+
+.robot-path-simulator {
+  border: 2px solid #4CAF50;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.robot-path-simulator .controls {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.robot-path-simulator .grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 1px;
+  background-color: #ccc;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.robot-path-simulator .grid-cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.robot-path-simulator .robot {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.robot-path-simulator .target {
+  background-color: #FF9800;
+  color: white;
+}
+
+.robot-path-simulator .obstacle {
+  background-color: #f44336;
+}
+
+.robot-path-simulator .path {
+  background-color: #E8F5E8;
+}
+
+.robot-path-simulator .empty {
+  background-color: #fff;
+}
+
+.robot-path-simulator .info {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+}
+
+.robot-path-simulator .note {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fff3cd;
+  border-radius: 4px;
+  font-style: italic;
+}
