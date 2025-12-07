@@ -61,6 +61,12 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
+    scripts: [
+      {
+        src: 'https://cdn.platform.openai.com/deployments/chatkit/chatkit.js',
+        async: true,
+      },
+    ],
     navbar: {
       title: 'Embodied Intelligence',
       logo: {

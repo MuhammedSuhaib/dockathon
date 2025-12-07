@@ -18,8 +18,8 @@ from embeddings import EmbeddingService
 from vector_store import VectorStore
 from rag import RAGService, QueryRequest, QueryResponse, SelectionRequest, SelectionResponse
 
-# Import ChatKit API
-from chatkit_api import app as chatkit_app
+# Import simple ChatKit API for MVP
+from simple_chatkit_api import app as chatkit_app
 
 # Global variable to hold the RAG service instance
 rag_service = None
@@ -33,14 +33,21 @@ async def lifespan(app: FastAPI):
     # Startup
     global rag_service
     try:
-        # Initialize the vector store
-        vector_store = VectorStore()
+        # Only initialize RAG service if Qdrant credentials are available (for RAG features)
+        qdrant_url = os.getenv("QDRANT_URL")
+        qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
-        # Initialize the RAG service
-        rag_service = RAGService()
-        rag_service.set_vector_store(vector_store)
+        if qdrant_url and qdrant_api_key:
+            # Initialize the vector store and RAG service for full functionality
+            vector_store = VectorStore()
+            rag_service = RAGService()
+            rag_service.set_vector_store(vector_store)
+            logger.info("Full RAG services initialized successfully")
+        else:
+            # For MVP without Qdrant, just initialize the ChatKit service
+            logger.info("Qdrant not configured - ChatKit service will handle chat functionality")
+            rag_service = None
 
-        logger.info("Services initialized successfully")
         yield
     except Exception as e:
         logger.error(f"Error during application startup: {e}")

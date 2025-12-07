@@ -15,6 +15,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "loguru>=0.7.2",
     "asyncpg>=0.31.0",
+    "openai-chatkit>=1.4.0"
 ]
 
 [build-system]
