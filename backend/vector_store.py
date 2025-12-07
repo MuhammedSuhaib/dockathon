@@ -39,7 +39,7 @@ class VectorStore:
             self.client = QdrantClient(
                 url=qdrant_url,
                 api_key=qdrant_api_key,
-                prefer_grpc=True  # Use gRPC for better performance
+                prefer_grpc=False
             )
             self.collection_name = collection_name
 
