@@ -9,5 +9,5 @@ questions based only on text selected by the user.
 3.SubAgent and Agent Skills     
 4.Base functionality defined above.     
 5.Better-auth       
-6.Personalise the content       
+6.Personalize the content       
 7.Translation       
