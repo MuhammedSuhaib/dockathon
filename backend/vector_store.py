@@ -49,6 +49,21 @@ class VectorStore:
             logging.error(f"Failed to initialize Qdrant client: {e}")
             raise
 
+    def check_connection(self):
+        """
+        Check if the Qdrant connection is working.
+
+        Returns:
+            True if connection is successful, False otherwise
+        """
+        try:
+            # Try to get collections to verify connection
+            self.client.get_collections()
+            return True
+        except Exception as e:
+            logging.error(f"Qdrant connection test failed: {e}")
+            return False
+
     def _create_collection_if_not_exists(self):
         """
         Create the Qdrant collection with 384-dimensional vectors and cosine similarity if it doesn't exist.

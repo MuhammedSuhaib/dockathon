@@ -49,6 +49,28 @@ class RAGService:
             logging.error(f"Failed to initialize RAG service: {e}")
             raise
 
+    def check_api_connection(self):
+        """
+        Check if the Gemini API connection is working.
+
+        Returns:
+            True if connection is successful, False otherwise
+        """
+        try:
+            # Make a simple test call to the API
+            response = self.openai_client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a test assistant."},
+                    {"role": "user", "content": "Test connection"}
+                ],
+                max_tokens=10
+            )
+            return True
+        except Exception as e:
+            logging.error(f"API connection test failed: {e}")
+            return False
+
     def set_vector_store(self, vector_store):
         """
         Set the vector store instance to use for retrieval.

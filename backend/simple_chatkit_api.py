@@ -182,14 +182,19 @@ class SimpleChatKitServer(ChatKitServer):
 
         answer = response.choices[0].message.content.strip()
 
-        # Create and return assistant message
+        # CRITICAL FIX: Generate a guaranteed unique ID to avoid collisions
+        # This addresses the potential ID collision issue when using non-OpenAI providers
         assistant_message = AssistantMessageItem(
-            id=f"msg_{uuid.uuid4().hex[:12]}",
+            id=f"assistant_{uuid.uuid4().hex}",  # Using full UUID to ensure uniqueness
             thread_id=thread.id,  # Add the required thread_id
-            created_at=0,
+            created_at=int(asyncio.get_event_loop().time()) if hasattr(asyncio.get_event_loop(), 'time') else 0,
             content=[AssistantMessageContent(text=answer)]
         )
 
+        # Add the message to the store
+        await self.store.add_thread_item(thread.id, assistant_message, context)
+
+        # Return the assistant message
         return assistant_message
 
 server = SimpleChatKitServer(store=store)
