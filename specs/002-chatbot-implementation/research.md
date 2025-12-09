@@ -1,42 +1,38 @@
-# Research: Chatbot Implementation Approach
+# Chatbot Implementation Research
 
-## Decision: Use Custom React Component with Existing Backend
+## Decision: ChatKit Integration Architecture
+**Rationale:** Implement ChatKit UI on frontend with FastAPI backend orchestrating RAG logic between ChatKit and Qdrant/Neon services. This provides clear separation of concerns with ChatKit handling UI/UX and FastAPI managing business logic and external service integration.
 
-### Rationale:
-After analyzing the available options, the best approach is to create a custom React chat component that integrates directly with the existing RAG backend. This approach:
+## Decision: Authentication System
+**Rationale:** JWT-based authentication with role-based access control for conversation privacy. This provides secure, stateless authentication that works well with REST APIs and allows proper conversation isolation between users.
 
-1. **Leverages existing infrastructure**: Uses the already-built RAG system with Qdrant vector store and Gemini integration
-2. **Maintains consistency**: Follows the same architecture patterns as the rest of the application
-3. **Minimizes dependencies**: No need to add external chat frameworks
-4. **Ensures tight integration**: Can be specifically designed to work with the textbook content
-5. **Maintains control**: Full control over UI/UX and functionality
+## Decision: Data Storage Strategy
+**Rationale:** Use Neon Serverless Postgres for conversation history with schema including user_id, conversation_id, message_id, content, timestamp, message_type. Qdrant will continue to handle vector storage for RAG system. This separates conversational data from vector embeddings while maintaining scalability.
 
-### Alternatives Considered:
+## Decision: UI/UX Approach
+**Rationale:** Floating chat widget positioned at bottom-right of screen with customizable visibility. This follows common chat interface patterns, doesn't interfere with main content, and remains easily accessible to users.
 
-#### 1. Agent SDK
-- **Pros**: Powerful agent capabilities, orchestration features
-- **Cons**: Overkill for simple Q&A interface, adds complexity, doesn't align with existing RAG architecture
-- **Verdict**: Not suitable for this use case
+## Decision: Error Handling Strategy
+**Rationale:** Implement graceful degradation when ChatKit, Qdrant, or Neon services are unavailable. This ensures the application remains functional even when individual components fail, providing better user experience.
 
-#### 2. Chatkit
-- **Pros**: Pre-built chat interface, real-time capabilities
-- **Cons**: Would require separate backend integration, doesn't leverage existing RAG system, adds external dependency
-- **Verdict**: Not appropriate for this textbook Q&A use case
+## Alternatives Considered:
 
-#### 3. Custom React Component (Selected)
-- **Pros**:
-  - Integrates directly with existing RAG backend
-  - Maintains Matrix-themed design consistency
-  - Full control over user experience
-  - Minimal dependencies
-  - Follows existing codebase patterns
-- **Cons**: Requires building UI from scratch
-- **Verdict**: Best fit for this project
+### For Architecture:
+- ChatKit directly connecting to Qdrant/Neon (rejected - creates tight coupling)
+- Custom UI for chat interface (rejected - ChatKit provides proven, feature-rich UI)
+- Client-side RAG integration (rejected - security concerns with API keys)
 
-### Implementation Strategy:
-- Create a ChatInterface.jsx component in the frontend/src/components directory
-- Use the existing `/api/query` endpoint for general questions
-- Use the existing `/api/selection` endpoint for text selection-based questions
-- Implement proper loading states, error handling, and message history
-- Follow the existing Matrix-themed design with green color scheme
-- Ensure responsive design for all screen sizes
+### For Authentication:
+- Session-based authentication (rejected - harder to scale, requires server-side session storage)
+- No authentication (rejected - violates privacy requirements)
+- OAuth integration (rejected - overcomplicates for this use case)
+
+### For UI:
+- Full-page chat interface (rejected - takes over user's focus from main content)
+- Minimal chat button expanding to side panel (rejected - floating widget more discoverable)
+- Embedded chat in content area (rejected - might conflict with existing UI)
+
+### For Error Handling:
+- Fail completely when any service unavailable (rejected - poor user experience)
+- Return generic error messages (rejected - unhelpful for troubleshooting)
+- Service-specific error handling (selected - provides appropriate feedback)
