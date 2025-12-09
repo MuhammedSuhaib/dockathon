@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.12.*"
 
 [[package]]
@@ -68,6 +68,7 @@ dependencies = [
     { name = "fastembed" },
     { name = "loguru" },
     { name = "openai" },
+    { name = "openai-agents" },
     { name = "openai-chatkit" },
     { name = "pydantic" },
     { name = "python-dotenv" },
@@ -83,6 +84,7 @@ requires-dist = [
     { name = "fastembed", specifier = "==0.7.4" },
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "openai", specifier = ">=1.55.0" },
+    { name = "openai-agents", specifier = ">=0.6.2" },
     { name = "openai-chatkit", specifier = ">=1.4.0" },
     { name = "pydantic", specifier = ">=2.9.0" },
     { name = "python-dotenv", specifier = ">=1.0.1" },

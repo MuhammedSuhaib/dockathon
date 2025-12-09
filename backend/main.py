@@ -1,227 +1,92 @@
-"""
-Main FastAPI application for the Backend RAG System with ChatKit integration.
-"""
-import logging
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional
-from loguru import logger
 import os
+import json
+from datetime import datetime
+from typing import AsyncIterator
+
 from dotenv import load_dotenv
+from fastapi import FastAPI, Request
+from fastapi.responses import Response, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 
-# Load environment variables
-load_dotenv()
+from openai import AsyncOpenAI
 
-# Import our modules (these will be imported after they are defined)
-from embeddings import EmbeddingService
-from vector_store import VectorStore
-from rag import RAGService, QueryRequest, QueryResponse, SelectionRequest, SelectionResponse
-
-# Import simple ChatKit API for MVP
-from simple_chatkit_api import app as chatkit_app
-
-# Global variable to hold the RAG service instance
-rag_service = None
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """
-    Lifespan event handler for FastAPI application.
-    Initializes services on startup and cleans up on shutdown.
-    """
-    # Startup
-    global rag_service
-    try:
-        # Check if required environment variables are set
-        gemini_api_key = os.getenv("GEMINI_API_KEY")
-        if not gemini_api_key:
-            logger.warning("GEMINI_API_KEY not set. RAG service will not function properly.")
-
-        # Only initialize RAG service if Qdrant credentials are available (for RAG features)
-        qdrant_url = os.getenv("QDRANT_URL")
-        qdrant_api_key = os.getenv("QDRANT_API_KEY")
-
-        if qdrant_url and qdrant_api_key:
-            try:
-                # Initialize the vector store and RAG service for full functionality
-                vector_store = VectorStore()
-
-                # Test vector store connection
-                if vector_store.check_connection():
-                    logger.info("Qdrant connection successful")
-                else:
-                    logger.error("Could not connect to Qdrant. RAG service will not function properly.")
-                    vector_store = None
-            except Exception as e:
-                logger.error(f"Failed to initialize vector store: {e}")
-                vector_store = None
-
-            if vector_store:
-                try:
-                    rag_service = RAGService()
-
-                    # Test API connection
-                    if rag_service.check_api_connection():
-                        logger.info("Gemini API connection successful")
-                    else:
-                        logger.error("Could not connect to Gemini API. RAG service will not function properly.")
-                        rag_service = None
-                except Exception as e:
-                    logger.error(f"Failed to initialize RAG service: {e}")
-                    rag_service = None
-
-                if rag_service and vector_store:
-                    rag_service.set_vector_store(vector_store)
-                    logger.info("Full RAG services initialized successfully")
-                else:
-                    logger.error("RAG service initialization failed due to API or vector store connection issues.")
-                    rag_service = None
-            else:
-                logger.error("Vector store initialization failed. RAG service will not be available.")
-                rag_service = None
-        else:
-            # For MVP without Qdrant, just initialize the ChatKit service but warn about missing RAG
-            logger.info("Qdrant not configured - Only ChatKit service available, RAG functionality will be limited")
-            rag_service = None
-
-        yield
-    except Exception as e:
-        logger.error(f"Error during application startup: {e}")
-        raise
-    finally:
-        # Shutdown
-        logger.info("Application shutdown")
-
-# Create the main FastAPI app with lifespan
-app = FastAPI(
-    title="Backend RAG API with ChatKit",
-    description="API for the Backend RAG System for Physical AI & Humanoid Robotics with ChatKit integration",
-    version="1.0.0",
-    lifespan=lifespan
+from chatkit.server import ChatKitServer
+from chatkit.types import (
+    AssistantMessageItem,
+    AssistantMessageContent,
+    ThreadItemDoneEvent,
+    ThreadMetadata,
+    UserMessageItem,
+    ThreadStreamEvent,
 )
 
-# Mount the ChatKit API
-app.mount("/chat", chatkit_app)
+from my_store import MyChatKitStore
 
-# Add logging configuration
-logging.basicConfig(level=logging.INFO)
+load_dotenv()
 
-class HealthResponse(BaseModel):
-    status: str
-    api_connected: bool = False
-    vector_store_connected: bool = False
-    rag_available: bool = False
+KEY = os.getenv("KEY")
 
-@app.get("/api/health", response_model=HealthResponse)
-async def health_check():
-    """
-    Health check endpoint to verify the service is operational.
+client = AsyncOpenAI(
+    api_key=KEY,
+    base_url="https://portal.qwen.ai/v1"
+)
 
-    Returns:
-        HealthResponse: Status of the service with detailed information
-    """
-    api_connected = False
-    vector_store_connected = False
-    rag_available = False
+app = FastAPI()
 
-    # Check if RAG service is initialized and connections are working
-    if rag_service:
-        # Check if both API and vector store are connected
-        try:
-            api_connected = rag_service.check_api_connection()
-        except:
-            api_connected = False
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-        try:
-            vector_store_connected = rag_service.vector_store.check_connection() if rag_service.vector_store else False
-        except:
-            vector_store_connected = False
 
-        rag_available = api_connected and vector_store_connected
+class MyServer(ChatKitServer[dict]):
+    async def respond(
+        self,
+        thread: ThreadMetadata,
+        input_user_message: UserMessageItem,
+        context: dict,
+    ) -> AsyncIterator[ThreadStreamEvent]:
 
-    return HealthResponse(
-        status="ok" if rag_available else "degraded",
-        api_connected=api_connected,
-        vector_store_connected=vector_store_connected,
-        rag_available=rag_available
-    )
+        messages = []
+        page = await self.store.load_thread_items(thread.id, None, 50, "asc", context)
+        for item in page.data:
+            if item.type == "user_message":
+                messages.append({"role": "user", "content": item.content[0].text})
+            elif item.type == "assistant_message":
+                messages.append({"role": "assistant", "content": item.content[0].text})
 
-@app.post("/api/query", response_model=QueryResponse)
-async def query_endpoint(request: QueryRequest):
-    """
-    Query endpoint that processes user questions against the indexed documents.
+        chat = await client.chat.completions.create(
+            model="qwen-plus",
+            messages=messages,
+            stream=True,
+        )
 
-    Args:
-        request: QueryRequest containing the user's question
+        async for chunk in chat:
+            delta = chunk.choices[0].delta
+            if delta and delta.content:
+                yield ThreadItemDoneEvent(
+                    item=AssistantMessageItem(
+                        thread_id=thread.id,
+                        id=self.store.generate_item_id(
+                            "message", thread, context
+                        ),
+                        created_at=datetime.now(),
+                        content=[AssistantMessageContent(text=delta.content)],
+                    )
+                )
 
-    Returns:
-        QueryResponse with the answer and source documents
-    """
-    try:
-        if not rag_service:
-            # Check if the issue is due to missing configuration
-            gemini_key_missing = not os.getenv("GEMINI_API_KEY")
-            qdrant_config_missing = not os.getenv("QDRANT_URL") or not os.getenv("QDRANT_API_KEY")
 
-            missing_parts = []
-            if gemini_key_missing:
-                missing_parts.append("GEMINI_API_KEY")
-            if qdrant_config_missing:
-                missing_parts.append("QDRANT configuration")
+server = MyServer(store=MyChatKitStore())
 
-            error_msg = f"RAG service not available. Missing: {', '.join(missing_parts) if missing_parts else 'Unknown issue'}"
-            raise HTTPException(status_code=503, detail=error_msg)
 
-        # Process the query using the RAG service
-        response = rag_service.query(request.query)
-        return response
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error processing query: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+@app.post("/chatkit")
+async def chatkit(request: Request):
+    raw = await request.body()
+    result = await server.process(raw, context={})
 
-@app.post("/api/selection", response_model=SelectionResponse)
-async def selection_endpoint(request: SelectionRequest):
-    """
-    Selection endpoint that answers questions based only on provided text.
+    if hasattr(result, "__aiter__"):
+        return StreamingResponse(result, media_type="text/event-stream")
 
-    Args:
-        request: SelectionRequest containing selected text and question
-
-    Returns:
-        SelectionResponse with the answer
-    """
-    try:
-        if not rag_service:
-            # Check if the issue is due to missing configuration
-            gemini_key_missing = not os.getenv("GEMINI_API_KEY")
-
-            missing_parts = []
-            if gemini_key_missing:
-                missing_parts.append("GEMINI_API_KEY")
-
-            error_msg = f"Selection service not available. Missing: {', '.join(missing_parts) if missing_parts else 'Unknown issue'}"
-            raise HTTPException(status_code=503, detail=error_msg)
-
-        # Process the selection-based request
-        response = rag_service.answer_from_selection(request.selected_text, request.question)
-        return response
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error processing selection: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-# Include middleware for error handling and logging
-@app.middleware("http")
-async def log_requests(request, call_next):
-    logger.info(f"Request: {request.method} {request.url}")
-    try:
-        response = await call_next(request)
-        logger.info(f"Response status: {response.status_code}")
-        return response
-    except Exception as e:
-        logger.error(f"Request failed: {e}")
-        raise
+    return Response(content=result.json, media_type="application/json")

@@ -1,15 +1,14 @@
 import os
 from openai import AsyncOpenAI
 import asyncio
+from dotenv import load_dotenv
+load_dotenv()
 
-# I've pasted your key below as requested.
-# ⚠️ SECURITY WARNING: This key is now exposed in your code. 
-# Do not share this file or push it to GitHub. 
-
+KEY=os.getenv("KEY") 
+print('KEY: ', KEY)
 
 client = AsyncOpenAI(
-    api_key=KEY, 
-    # CRITICAL FIX: The 'y7...' token only works with this Portal URL, not DashScope.
+    api_key=KEY,
     base_url="https://portal.qwen.ai/v1" 
 )
 

@@ -12,32 +12,32 @@ Implement an AI-powered chatbot interface for the Embodied Intelligence textbook
 ## Technical Context
 
 **Language/Version**: JavaScript/TypeScript for frontend, Python 3.11+ for backend
-**Primary Dependencies**: @openai/chatkit-react for frontend UI, FastAPI for backend, Neon Serverless Postgres for conversation storage, Qdrant Cloud for vector storage and retrieval
-**Storage**: Neon Serverless Postgres for conversation history (user_id, conversation_id, message_id, content, timestamp, message_type) and Qdrant for RAG vector storage
+**Primary Dependencies**: @openai/chatkit-react for frontend UI, FastAPI for backend, existing RAG components
+**Storage**: (MVP) In-memory/ephemeral storage, (Future) Neon Serverless Postgres for conversation history
 **Testing**: Jest for frontend component tests, pytest for backend tests (using existing test infrastructure)
 **Target Platform**: Web browser (Docusaurus-based documentation site)
-**Project Type**: Web application (frontend chat widget + backend API service)
+**Project Type**: Docusaurus site with embedded chat component
 **Performance Goals**: <3 second response time for typical queries, responsive UI with loading states
-**Constraints**: Must implement JWT-based auth, follow Matrix-themed UI design, maintain accessibility standards
-**Scale/Scope**: Multi-user session-based chat interface with conversation persistence and role-based access control
+**Constraints**: Must fix existing ChatKit issues, follow Matrix-themed UI design, maintain accessibility standards, ensure ChatKit works within Docusaurus
+**Scale/Scope**: MVP chat functionality with future enhancements for persistence and auth
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- ✅ Spec-Driven Development (SDD) Compliance: Following the spec created in spec.md with clear requirements
-- ✅ Smallest Testable Step Development: Will implement chatbot in incremental steps (UI, then backend integration, then auth)
-- ✅ Complete Information Verification: All requirements clearly specified in the feature spec
-- ✅ No Mockup or API Fabrication: Using actual ChatKit, FastAPI, Neon, and Qdrant APIs
-- ✅ Context7 Library Verification: Will verify ChatKit, FastAPI, Neon, and Qdrant usage via Context7
+- ✅ Spec-Driven Development (SDD) Compliance: Following the updated spec with MVP approach and Docusaurus integration
+- ✅ Smallest Testable Step Development: Will implement in incremental steps (fix ChatKit → MVP → future features)
+- ✅ Complete Information Verification: Requirements updated to reflect existing backend and Docusaurus frontend
+- ✅ No Mockup or API Fabrication: Using actual ChatKit, FastAPI APIs and existing components
+- ✅ Context7 Library Verification: Will verify ChatKit and FastAPI usage via Context7
 - ✅ User Approval Requirement: Will wait for approval after each implementation step
-- ✅ Minimalist Workflow Respect: Implementing only the required functionality without extras
-- ✅ Context7 Library Constraint: Using only approved libraries (ChatKit, FastAPI, Neon, Qdrant)
-- ✅ Context7 Usage Protocol: Will use Context7 for all library implementations
-- ✅ Task Restatement Protocol: The task is to implement a chatbot interface integrating ChatKit, FastAPI, Neon, and Qdrant
-- ✅ No Indexing Pipeline Hallucination: Not creating new indexing, using existing system
-- ✅ Minimal Diff Production: Making minimal changes to implement the chatbot
-- ✅ Single Endpoint Development: Will create focused endpoints one at a time
+- ✅ Minimalist Workflow Respect: Focusing on MVP first as specified
+- ✅ Context7 Library Constraint: Using only approved libraries (ChatKit, FastAPI)
+- ✅ Context7 Usage Protocol: Will use Context7 for ChatKit and FastAPI implementations
+- ✅ Task Restatement Protocol: The task is to fix ChatKit embedding in Docusaurus and create working MVP
+- ✅ No Indexing Pipeline Hallucination: Using existing RAG system, not creating new indexing
+- ✅ Minimal Diff Production: Making minimal changes to fix ChatKit integration
+- ✅ Single Endpoint Development: Will work with existing backend endpoints
 - ✅ No Hallucination Policy: Using real APIs and documented features only
 - ✅ No Invented APIs: Using existing, documented APIs from specified libraries
 - ✅ Conciseness Requirement: Keeping implementations focused and concise
@@ -63,20 +63,17 @@ frontend/
 ├── src/
 │   ├── components/
 │   │   └── ChatWidget.jsx        # Floating chat widget component
-│   ├── hooks/
-│   │   └── useChatAuth.js        # JWT-based authentication hook
-│   └── services/
-│       └── chatkit-service.js    # ChatKit integration service
+│   ├── pages/
+│   │   └── ChatPage.jsx          # Dedicated chat page (if needed)
+│   └── theme/
+│       └── ChatWidgetWrapper.jsx # Docusaurus-compatible ChatKit wrapper
 
 backend/
 ├── src/
-│   ├── models/
-│   │   ├── user.py              # User model with JWT auth
-│   │   ├── conversation.py      # Conversation model for Neon
-│   │   └── message.py           # Message model for Neon
+│   ├── models/                   # (Future) Models for auth and storage
 │   ├── services/
-│   │   ├── auth_service.py      # JWT authentication service
-│   │   ├── neon_service.py      # Neon Postgres service
+│   │   ├── auth_service.py      # (Future) JWT authentication service
+│   │   ├── neon_service.py      # (Future) Neon Postgres service
 │   │   ├── qdrant_service.py    # Qdrant vector store service
 │   │   └── rag_service.py       # RAG orchestration service
 │   └── api/
@@ -87,7 +84,7 @@ backend/
     └── contract/
 ```
 
-**Structure Decision**: Web application with floating ChatWidget component implementing JWT authentication, connecting to FastAPI backend that orchestrates RAG logic between ChatKit and Qdrant/Neon services.
+**Structure Decision**: Docusaurus-based documentation site with ChatKit component integrated using a Docusaurus-compatible wrapper, connecting to existing FastAPI backend that orchestrates RAG logic.
 
 ## Complexity Tracking
 

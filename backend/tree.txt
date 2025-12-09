@@ -1,0 +1,28 @@
+ Directory of D:\VScode\GitHub\HACKATHON\dockathon\backend
+
+12/09/2025  06:00 PM    <DIR>          .
+12/09/2025  06:00 PM    <DIR>          ..
+12/09/2025  08:52 PM               154 .env
+12/09/2025  06:00 PM                28 .env.example
+12/09/2025  05:08 PM             1,370 .gitignore
+12/09/2025  05:43 PM    <DIR>          .specify
+12/07/2025  06:03 PM    <DIR>          .venv
+12/09/2025  06:02 PM    <DIR>          backend.egg-info
+12/09/2025  05:08 PM            13,189 chatkit_api.py
+12/09/2025  05:08 PM             2,012 embeddings.py
+12/09/2025  05:08 PM            10,533 GEMINI.md
+12/09/2025  05:08 PM             5,127 indexer.py
+12/09/2025  09:10 PM             7,604 main.py
+12/09/2025  06:02 PM               689 pyproject.toml       
+12/09/2025  05:08 PM             6,950 rag.py
+12/09/2025  05:08 PM             4,191 README.md
+12/09/2025  09:02 PM             6,750 simple_chatkit_api.py
+12/09/2025  05:08 PM             5,898 test_all_modules.py  
+12/09/2025  05:08 PM               869 test_embeddings.py   
+12/09/2025  08:14 PM               797 test_gemini.py       
+12/09/2025  05:08 PM             3,201 test_integration.py  
+12/09/2025  06:02 PM           129,352 uv.lock
+12/09/2025  05:08 PM             7,120 vector_store.py      
+12/09/2025  09:10 PM    <DIR>          __pycache__
+              18 File(s)        205,834 bytes
+               6 Dir(s)  29,028,114,432 bytes free
