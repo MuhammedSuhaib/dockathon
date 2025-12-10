@@ -32,23 +32,28 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
     const selected = getSelectedText() || currentSelectedText;
     if (!selected) return alert('Please select some text first.');
     if (selected.length > 2000) return alert('Selected text is too long. Select a shorter portion.');
-    const questionPrompt = `About this text: "${selected}". Question: `;
-    setInputValue(questionPrompt);
-    setCurrentSelectedText(selected);
+    setInputValue(''); // Clears the input field for the user's question
+    setCurrentSelectedText(selected); // Store the selected text
   };
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
-    const isSelectionQuery = currentSelectedText && inputValue.startsWith(`About this text: "${currentSelectedText}" Question: `);
-    const actualQuestion = isSelectionQuery
-      ? inputValue.replace(`About this text: "${currentSelectedText}" Question: `, '').trim()
-      : inputValue;
+    const isSelectionQuery = !!currentSelectedText;
+    const actualQuestion = inputValue.trim();
+
+    // FIX: Conditionally set the text to be displayed in the thread
+    let messageText = inputValue;
+    if (isSelectionQuery && currentSelectedText) {
+        // Use a clear visual separator (e.g., " | ") instead of \n\n to prevent HTML rendering issues.
+        // We will also use a simple structure to be safer within the existing component's rendering.
+        messageText = `Q: ${inputValue} || [Context: ${currentSelectedText.substring(0, 150)}...]`;
+    }
 
     const userMessage = {
       id: Date.now(),
-      text: inputValue,
+      text: messageText, // Use the modified text
       sender: 'user',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
@@ -58,15 +63,15 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
 
     try {
       const response = await fetch(
-        isSelectionQuery && currentSelectedText 
-          ? `${API_BASE}/api/selection` 
+        isSelectionQuery && currentSelectedText
+          ? `${API_BASE}/api/selection`
           : `${API_BASE}/api/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(
-            isSelectionQuery 
-              ? { selected_text: currentSelectedText, question: actualQuestion }
+            isSelectionQuery
+              ? { selected_text: currentSelectedText, question: actualQuestion } // Send stored text and user input
               : { query: inputValue }
           ),
         }
@@ -85,6 +90,8 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
 
       setMessages(prev => [...prev, botMessage]);
       setInputValue('');
+      setCurrentSelectedText(null); // Clear selected text state after successful send
+
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, {
@@ -94,6 +101,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
       setInputValue('');
+      setCurrentSelectedText(null); // Clear selected text state on error too
     } finally { setIsLoading(false); }
   };
 
@@ -111,6 +119,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
       maxWidth: isEmbedded ? '100%' : '800px',
       margin: isEmbedded ? '0' : '20px 0', width: isEmbedded ? '100%' : 'auto'
     }}>
+      {/* Note: I removed the inner header div earlier as per the previous fix for double headers */}
 
       {/* Messages */}
       <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -151,7 +160,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
             <input
               type="text" value={inputValue} onChange={e => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown} disabled={isLoading}
-              placeholder="Ask about robotics, AI, or textbook content..."
+              placeholder={currentSelectedText ? "Type your question about the selected text..." : "Ask about robotics, AI, or textbook content..."}
               style={{ flex: 1, padding: '12px 16px', border: '1px solid #00ff41', borderRadius: '24px', backgroundColor: '#001a0d', color: '#00ff41', outline: 'none', fontFamily: 'monospace' }}
             />
             <button type="submit" disabled={!inputValue.trim() || isLoading}
