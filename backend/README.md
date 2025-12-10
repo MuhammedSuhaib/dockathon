@@ -79,6 +79,10 @@ The frontend component (`ChatKitInterface.jsx`) has been updated to connect dire
 ## Running the Application
 
 To run the full application:
+0. Activate
+```
+.venv\Scripts\activate
+```
 
 1. Start the backend server:
    ```bash

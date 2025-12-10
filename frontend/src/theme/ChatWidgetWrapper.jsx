@@ -7,7 +7,7 @@ const ChatWidgetWrapper = ({ isEmbedded = false, conversationId = 'default-conve
   // We're using dynamic import to avoid SSR issues with ChatKit
   const { control, state } = useChatKit({
     api: {
-      url: `${window.location.protocol}//${window.location.hostname}:8000/chat`, // Backend ChatKit server URL - mounted at /chat
+      url: `${window.location.protocol}//${window.location.hostname}:8000/chatkit`, // Backend ChatKit server URL - mounted at /chatkit
       domainKey: 'localhost', // Required domain key
     },
     initialThread: conversationId,
