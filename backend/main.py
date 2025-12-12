@@ -3,7 +3,7 @@ import json
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+from configs.config import model_config
 from agents import Agent, Runner
 from agents.models.openai_chatcompletions import OpenAIChatCompletionsModel
 from agents.run import RunConfig
@@ -11,21 +11,10 @@ from openai import AsyncOpenAI
 
 logging.basicConfig(level=logging.INFO)
 
-# QWEN CLIENT
-external_client = AsyncOpenAI(
-    api_key="6illN1cvAe5bRWVi3jIfMVwrzYNG3mciaS7-r5GGLQB5bvUxYoAaUAE80acFUeIsh-JIciuCwIrmc74dr1B7bw",
-    base_url="https://portal.qwen.ai/v1"
-)
-
-model = OpenAIChatCompletionsModel(
-    model="qwen3-coder-plus",
-    openai_client=external_client
-)
-
 agent = Agent(
     name="SocialMediaPoster",
     instructions="hi",
-    model=model
+    model=model_config
 )
 
 config = RunConfig()
@@ -39,59 +28,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/test-qwen")
-async def test_qwen():
-    try:
-        r = await client.chat.completions.create(
-            model="qwen3-coder-plus",
-            messages=[{"role": "user", "content": "ping"}]
-        )
-        return {"reply": r.choices[0].message.content}
-    except Exception as e:
-        return {"error": str(e)}
-
-import logging
-import json
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-
-from agents import Agent, Runner
-from agents.models.openai_chatcompletions import OpenAIChatCompletionsModel
-from agents.run import RunConfig
-from openai import AsyncOpenAI
-
-logging.basicConfig(level=logging.INFO)
-
-# QWEN CLIENT
-external_client = AsyncOpenAI(
-    api_key="6illN1cvAe5bRWVi3jIfMVwrzYNG3mciaS7-r5GGLQB5bvUxYoAaUAE80acFUeIsh-JIciuCwIrmc74dr1B7bw",
-    base_url="https://portal.qwen.ai/v1"
-)
-
-model = OpenAIChatCompletionsModel(
-    model="qwen3-coder-plus",
-    openai_client=external_client
-)
-
-agent = Agent(
-    name="SocialMediaPoster",
-    instructions="hi",
-    model=model
-)
-
-config = RunConfig()
-
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# TEST ENDPOINT (fixed client variable)
 @app.get("/test-qwen")
 async def test_qwen():
     try:
@@ -102,6 +38,8 @@ async def test_qwen():
         return {"reply": r.choices[0].message.content}
     except Exception as e:
         return {"error": str(e)}
+
+from configs.config import external_client
 
 
 @app.post("/api/query")

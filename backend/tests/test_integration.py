@@ -2,12 +2,15 @@
 Integration tests for the Backend RAG System.
 These tests verify that different components work together correctly.
 """
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import unittest
 from unittest.mock import patch, Mock
-import os
 from main import app
 from fastapi.testclient import TestClient
-from rag import QueryRequest, SelectionRequest
+from services.rag import QueryRequest, SelectionRequest
 
 
 class TestAPIIntegration(unittest.TestCase):
@@ -19,12 +22,12 @@ class TestAPIIntegration(unittest.TestCase):
             with patch('main.RAGService'):
                 # Mock vector store
                 mock_vector_store = Mock()
-                
+
                 # Mock rag service
                 mock_rag_service = Mock()
                 mock_rag_service.query.return_value = {"answer": "Test answer", "sources": ["/test/doc.md"]}
                 mock_rag_service.answer_from_selection.return_value = {"answer": "Test selection answer"}
-                
+
                 # Set the mocked services in the app
                 from main import rag_service
                 # In the actual app, we would set these, but for testing

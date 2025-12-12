@@ -1,15 +1,17 @@
 """
 Module for RAG (Retrieval Augmented Generation) functionality.
 """
-from typing import List, Dict, Any, Optional
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from typing import List
 import logging
 import os
 from openai import OpenAI
-from dotenv import load_dotenv
 from pydantic import BaseModel
-import asyncio
-
-# Load environment variables
+from dotenv import load_dotenv
+from configs.config import external_client, model_config
 load_dotenv()
 
 class QueryRequest(BaseModel):
@@ -32,16 +34,9 @@ class RAGService:
         Initialize the RAG service with required components.
         """
         try:
-            # Initialize Qwen client with Qwen API
-            qwen_api_key = os.getenv("QWEN_API_KEY")
-            if not qwen_api_key:
-                raise ValueError("QWEN_API_KEY must be set in environment variables")
-
-            self.client = OpenAI(
-                api_key=qwen_api_key,
-                base_url="https://portal.qwen.ai/v1"
-            )
-            self.model = "qwen3-coder-plus"
+            # Use the centralized client configuration
+            self.client = external_client
+            self.model = model_config.model if hasattr(model_config, 'model') else 'qwen3-coder-plus'
 
             # We'll initialize vector store separately to avoid circular dependencies
             self.vector_store = None
@@ -51,14 +46,14 @@ class RAGService:
 
     def check_api_connection(self):
         """
-        Check if the Gemini API connection is working.
+        Check if the Qwen API connection is working.
 
         Returns:
             True if connection is successful, False otherwise
         """
         try:
             # Make a simple test call to the API
-            response = self.openai_client.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": "You are a test assistant."},

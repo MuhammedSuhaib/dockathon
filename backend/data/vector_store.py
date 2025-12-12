@@ -1,17 +1,18 @@
 """
 Module for interacting with Qdrant vector database.
 """
-from typing import List, Dict, Any, Optional
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from typing import List, Dict, Any
 import logging
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from qdrant_client.http.models import Distance, VectorParams
 from pydantic import BaseModel
-import uuid
 import os
 from dotenv import load_dotenv
-
-# Load environment variables
 load_dotenv()
 
 class DocumentChunk(BaseModel):

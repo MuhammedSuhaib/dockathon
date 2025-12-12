@@ -1,12 +1,15 @@
 """
 Comprehensive unit tests for the Backend RAG System.
 """
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import unittest
 from unittest.mock import Mock, patch, MagicMock
-import os
-from embeddings import EmbeddingService
-from vector_store import VectorStore, DocumentChunk
-from rag import RAGService, QueryRequest, QueryResponse, SelectionRequest, SelectionResponse
+from data.embeddings import EmbeddingService
+from data.vector_store import VectorStore, DocumentChunk
+from services.rag import RAGService, QueryRequest, QueryResponse, SelectionRequest, SelectionResponse
 
 
 class TestEmbeddingService(unittest.TestCase):

@@ -2,37 +2,29 @@
 Unified ChatKit Server with direct OpenAI integration and RAG capabilities.
 Combines features from simple_chatkit_api and chatkit_api into a single implementation.
 """
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
-from fastapi import FastAPI
+import sys
 import os
-from dotenv import load_dotenv
-from openai import OpenAI
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from typing import List, Dict, Any
+import os
 import asyncio
 import uuid
+from fastapi import FastAPI
 from chatkit.server import ChatKitServer
 from chatkit.store import Store
 from chatkit.types import ThreadMetadata, ThreadItem, Page, UserMessageItem, AssistantMessageItem
 from chatkit.types import AssistantMessageContent
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-import logging
 from loguru import logger
-from openai import AsyncOpenAI
-
+from dotenv import load_dotenv
+from configs.config import external_client, model_config
 load_dotenv()
 
-# Initialize Qwen client with Qwen API
-qwen_api_key = os.getenv("QWEN_API_KEY")
-if not qwen_api_key:
-    raise ValueError("QWEN_API_KEY must be set in environment variables")
-
-client = AsyncOpenAI(
-    api_key=qwen_api_key,
-    base_url="https://portal.qwen.ai/v1"
-)
-
-model = "qwen3-coder-plus"
+# Use the configured client and model from config
+client = external_client
+model = model_config.model if hasattr(model_config, 'model') else 'qwen3-coder-plus'
 
 # Initialize Qdrant client for RAG functionality
 qdrant_url = os.getenv("QDRANT_URL")

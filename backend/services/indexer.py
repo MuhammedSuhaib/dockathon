@@ -1,16 +1,16 @@
 """
 Script for indexing documents from the docs directory into the vector store.
 """
+import sys
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import logging
 from pathlib import Path
 from typing import List
-import asyncio
+from data.embeddings import EmbeddingService
+from data.vector_store import VectorStore, DocumentChunk
 from dotenv import load_dotenv
-from embeddings import EmbeddingService
-from vector_store import VectorStore, DocumentChunk
-
-# Load environment variables
 load_dotenv()
 
 # Configure logging
