@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
-import os
 from openai import AsyncOpenAI
+import os
 import asyncio
 
 load_dotenv()

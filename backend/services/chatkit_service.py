@@ -141,7 +141,7 @@ def search_documents(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     """Search documents in Qdrant based on the query."""
     try:
         # Import embedding service to generate query embedding
-        from embeddings import EmbeddingService
+        from data.embeddings import EmbeddingService
         embedding_service = EmbeddingService()
         query_embedding = embedding_service.embed_text(query)
         

@@ -1,25 +1,12 @@
 import logging
-import json
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from configs.config import model_config
-from agents import Agent, Runner
-from agents.models.openai_chatcompletions import OpenAIChatCompletionsModel
-from agents.run import RunConfig
-from openai import AsyncOpenAI
-
-logging.basicConfig(level=logging.INFO)
-
-agent = Agent(
-    name="SocialMediaPoster",
-    instructions="hi",
-    model=model_config
-)
-
-config = RunConfig()
+from agents import Runner
+from simple_agents.aagents import Triage_Agent
+from pydantic import BaseModel
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,59 +15,65 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/test-qwen")
-async def test_qwen():
-    try:
-        r = await external_client.chat.completions.create(
-            model="qwen3-coder-plus",
-            messages=[{"role": "user", "content": "ping"}]
-        )
-        return {"reply": r.choices[0].message.content}
-    except Exception as e:
-        return {"error": str(e)}
+# ---------------------------
+# Pydantic Models for Frontend Requests
+# ---------------------------
 
-from configs.config import external_client
+# Matches the payload for the general chat endpoint (/api/query)
+class QueryRequest(BaseModel):
+    query: str
 
+# Matches the payload for the selection endpoint (/api/selection)
+class SelectionRequest(BaseModel):
+    selected_text: str
+    question: str
+
+# ---------------------------
+# FastAPI Endpoints (Matching React expectations)
+# ---------------------------
+
+@app.get("/")
+def read_root():
+    return {"message": "Python Assistant Backend is running."}
 
 @app.post("/api/query")
-async def chatkit_endpoint(request: Request):
-    try:
-        raw = await request.body()
-        text = raw.decode().strip()
-        logging.info(f"Received raw: {text}")
+async def handle_query(req: QueryRequest):
+    """Handles general chat queries from the React component."""
+    logging.info(f"Received general query: {req.query}")
+    
+    # Run the main agent with the general query
+    result = await Runner.run(
+        Triage_Agent,
+        req.query
+    )
+    
+    # CRITICAL: Response structure must match React component: {"answer": "...", "sources": []}
+    return {
+        "answer": result.final_output,
+        "sources": [] # Must be included, even if empty
+    }
 
-        # Accept both JSON body and plain text
-        try:
-            data = json.loads(text)
-            user_input = data.get("message") or data.get("input") or text
-        except:
-            user_input = text
-
-        result = await Runner.run(
-            starting_agent=agent,
-            input=user_input,
-            run_config=config
-        )
-
-        # SSE streaming
-        async def event_generator():
-            # If the agent streams tokens/steps
-            if hasattr(result, "__aiter__"):
-                async for step in result:
-                    yield f"data: {step.dict()}\n\n"
-            else:
-                yield f"data: {result.dict()}\n\n"
-
-        return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-    except Exception as e:
-        logging.exception("Error in /api/query")
-        return Response(
-            content=json.dumps({"error": str(e)}),
-            media_type="application/json"
-        )
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+@app.post("/api/selection")
+async def handle_selection(req: SelectionRequest):
+    """Handles queries based on selected text (RAG context)."""
+    logging.info(f"Received selection query. Question: {req.question}")
+    
+    # Construct a RAG-style prompt for the agent
+    prompt = (
+        f"Based *only* on the following context, answer the user's question. "
+        f"If the context does not contain the answer, state that. "
+        f"Context: \"{req.selected_text}\" "
+        f"Question: {req.question}"
+    )
+    
+    # Run the agent with the context-aware prompt
+    result = await Runner.run(
+        Triage_Agent,
+        prompt
+    )
+    
+    # CRITICAL: Response structure must match React component: {"answer": "...", "sources": []}
+    return {
+        "answer": result.final_output,
+        "sources": [] # Must be included, even if empty
+    }

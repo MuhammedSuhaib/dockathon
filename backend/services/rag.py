@@ -87,7 +87,7 @@ class RAGService:
         """
         try:
             # Step 1: Generate embedding for the query
-            from embeddings import EmbeddingService
+            from data.embeddings import EmbeddingService
             embedding_service = EmbeddingService()
             query_embedding = embedding_service.embed_text(query_text)
             

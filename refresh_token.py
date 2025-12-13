@@ -66,5 +66,5 @@ except Exception as e:
     log_message(f"❌ An unexpected error occurred: {e}")
 
 
-# C:\Users\giaic\.claude-code-router\config.json
-# C:\Users\giaic\.qwen\oauth_creds.json
+# code C:\Users\giaic\.claude-code-router\config.json
+# code C:\Users\giaic\.qwen\oauth_creds.json

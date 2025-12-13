@@ -6,6 +6,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import logging
+import uuid
 from pathlib import Path
 from typing import List
 from data.embeddings import EmbeddingService
@@ -51,7 +52,7 @@ def chunk_document(content: str, chunk_size: int = 1000, overlap: int = 100) -> 
     
     return chunks
 
-def index_documents(docs_path: str = "../docs", vector_store: VectorStore = None):
+def index_documents(docs_path: str = "../frontend/docs", vector_store: VectorStore = None):
     """
     Index all .md and .mdx files from the specified directory into the vector store.
     
@@ -101,8 +102,8 @@ def index_documents(docs_path: str = "../docs", vector_store: VectorStore = None
                     # Generate embedding for the chunk
                     embedding = embedding_service.embed_text(chunk_text)
                     
-                    # Create a unique ID for this chunk
-                    chunk_id = f"{doc_file.as_posix()}_{i}"
+                    # Create a unique ID for this chunk (Qdrant requires valid IDs)
+                    chunk_id = str(uuid.uuid4())
                     
                     # Create DocumentChunk object
                     doc_chunk = DocumentChunk(
