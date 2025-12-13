@@ -7,13 +7,19 @@ from pydantic import BaseModel
 from services.rag import RAGService
 from data.vector_store import VectorStore
 
-# Create global vector store instance to avoid creating on every request
-vector_store = VectorStore()
-rag_service = RAGService()
-rag_service.set_vector_store(vector_store)
+# Initialize services globally but handle initialization errors gracefully
+try:
+    vector_store = VectorStore()
+    rag_service = RAGService()
+    rag_service.set_vector_store(vector_store)
+except Exception as e:
+    logging.error(f"Failed to initialize services: {e}")
+    vector_store = None
+    rag_service = None
 
 app = FastAPI()
 
+# CORS middleware for Vercel deployment
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -47,6 +53,14 @@ def read_root():
 async def handle_query(req: QueryRequest):
     """Handles general chat queries from the React component."""
     logging.info(f"Received general query: {req.query}")
+
+    # Check if services are properly initialized
+    if not rag_service or not vector_store:
+        logging.error("RAG service not initialized")
+        return {
+            "answer": "Service temporarily unavailable",
+            "sources": []
+        }
 
     # Use global RAG service to get context from Qdrant
     # Get relevant context from Qdrant
@@ -83,7 +97,15 @@ async def handle_query(req: QueryRequest):
 async def handle_selection(req: SelectionRequest):
     """Handles queries based on selected text (RAG context)."""
     logging.info(f"Received selection query. Question: {req.question}")
-    
+
+    # Check if services are properly initialized
+    if not rag_service or not vector_store:
+        logging.error("RAG service not initialized")
+        return {
+            "answer": "Service temporarily unavailable",
+            "sources": []
+        }
+
     # Use global RAG service to get additional context from Qdrant
     # Get relevant context from Qdrant based on the question
     try:
@@ -121,3 +143,8 @@ async def handle_selection(req: SelectionRequest):
         "answer": result.final_output,
         "sources": rag_result.sources if rag_result and hasattr(rag_result, 'sources') else [] # Must be included, even if empty
     }
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Vercel deployment."""
+    return {"status": "healthy", "message": "Backend is running"}
