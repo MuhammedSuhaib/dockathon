@@ -156,15 +156,14 @@ html[data-theme='dark'] div[style*="zIndex"] li {
 
 /* DARK MODE BUTTONS */
 html[data-theme='dark'] .button--primary {
-  background-color: rgba(0, 204, 68, 0.1) !important;
+  background-color: #00ff41 !important;
   border: 1px solid #00ff41 !important;
-  color: #00ff41 !important;
+  color: #000000 !important;
   text-shadow: none;
+
 }
 
 html[data-theme='dark'] .button--primary:hover {
-  background-color: #00ff41 !important;
-  color: #000000 !important;
   box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
 }
 
@@ -181,10 +180,19 @@ html[data-theme='dark'] .button--secondary:hover {
 /* --- 7. FOOTER --- */
 
 /* LIGHT MODE */
-.footer {
-  background: #f5f6f7;
-  color: #1c1e21;
+html[data-theme='light'] .footer {
+  background-color: #f5f6f7 !important;
+  color: #1c1e21 !important;
 }
+
+html[data-theme='light'] .footer a {
+  color: #04b931 !important;
+}
+
+html[data-theme='light'] .footer__title {
+  color: #006622 !important;
+}
+
 
 /* DARK MODE */
 html[data-theme='dark'] .footer {
