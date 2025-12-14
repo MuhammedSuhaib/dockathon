@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const API_BASE = "http://localhost:8000"; // FastAPI backend
+const API_BASE = "https://speckit-plus-production.up.railway.app"; // FastAPI backend
 
 const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded = false }) => {
   const [messages, setMessages] = useState([

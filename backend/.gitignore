@@ -126,3 +126,6 @@ dmypy.json
 
 # Coverage
 .coverage*
+
+# Backend documentation
+BACKEND_CODE_DOCUMENTATION.md
