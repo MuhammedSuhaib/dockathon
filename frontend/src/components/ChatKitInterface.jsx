@@ -186,7 +186,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
-        text: 'System Error: Unable to connect to backend neural network.',
+        text: 'System Error: Change the Gemini API .',
         sender: 'bot',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
