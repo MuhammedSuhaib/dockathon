@@ -1,11 +1,12 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from agents import Runner
 from simple_agents.aagents import Triage_Agent
 from pydantic import BaseModel
 from services.rag import RAGService
 from data.vector_store import VectorStore
+from auth_utils import verify_token, get_user_id_from_token
 
 # Initialize services globally but handle initialization errors gracefully
 try:
@@ -16,6 +17,21 @@ except Exception as e:
     logging.error(f"Failed to initialize services: {e}")
     vector_store = None
     rag_service = None
+
+# Authentication dependency
+def get_current_user(authorization: str = Header(...)) -> dict:
+    """Dependency to verify JWT token and get current user."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid Authorization header")
+
+    token = authorization.split(" ")[1]
+
+    try:
+        user_data = verify_token(token)
+        return user_data
+    except Exception as e:
+        logging.error(f"Token verification failed: {e}")
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 app = FastAPI()
 
@@ -59,9 +75,9 @@ def read_root():
     return {"message": "Python Assistant Backend is running."}
 
 @app.post("/api/query")
-async def handle_query(req: QueryRequest):
+async def handle_query(req: QueryRequest, current_user: dict = Depends(get_current_user)):
     """Handles general chat queries from the React component."""
-    logging.info(f"Received general query: {req.query}")
+    logging.info(f"Received general query from user {current_user.get('sub', 'unknown')}: {req.query}")
 
     # Check if services are properly initialized
     if not rag_service or not vector_store:
@@ -103,9 +119,9 @@ async def handle_query(req: QueryRequest):
     }
 
 @app.post("/api/selection")
-async def handle_selection(req: SelectionRequest):
+async def handle_selection(req: SelectionRequest, current_user: dict = Depends(get_current_user)):
     """Handles queries based on selected text (RAG context)."""
-    logging.info(f"Received selection query. Question: {req.question}")
+    logging.info(f"Received selection query from user {current_user.get('sub', 'unknown')}. Question: {req.question}")
 
     # Check if services are properly initialized
     if not rag_service or not vector_store:
@@ -159,8 +175,9 @@ def health_check():
     return {"status": "healthy", "message": "Backend is running"}
 
 @app.post("/api/translate-text")
-async def translate_text(req: TranslationRequest):
+async def translate_text(req: TranslationRequest, current_user: dict = Depends(get_current_user)):
     """Translates text to the specified target language."""
+    logging.info(f"Received translation request from user {current_user.get('sub', 'unknown')}")
     from deep_translator import GoogleTranslator
 
     try:

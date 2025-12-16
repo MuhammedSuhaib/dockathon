@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { authClient } from '../lib/auth-client';
 
 // SSR-safe API_BASE definition
 const getApiBase = () => {
@@ -137,6 +138,13 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
+    // Check if user is authenticated
+    const session = await authClient.getSession();
+    if (!session) {
+      alert("Access Denied: Jack in to the Matrix first.");
+      return;
+    }
+
     const actualQuestion = inputValue.trim();
     const contextToSend = stagedSelection;
 
@@ -154,13 +162,19 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
     setIsLoading(true);
 
     try {
+      // Get the token for authorization
+      const token = session.data?.token || session.data?.user?.id; // Adjust based on your JWT payload config
+
       const response = await fetch(
         contextToSend
           ? `${API_BASE}/api/selection`
           : `${API_BASE}/api/query`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // ✅ Send Token to Python
+          },
           body: JSON.stringify(
             contextToSend
               ? { selected_text: contextToSend, question: actualQuestion }

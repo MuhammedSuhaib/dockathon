@@ -12,7 +12,10 @@ dependencies = [
     "loguru>=0.7.2",
     "asyncpg>=0.31.0",
     "openai-chatkit>=1.4.0",
-    "deep-translator>=1.9.8"
+    "deep-translator>=1.9.8",
+    "pyjwt[crypto]>=2.8.0",
+    "cryptography>=42.0.0",
+    "requests>=2.31.0"
 ]
 
 [build-system]

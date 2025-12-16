@@ -5,3 +5,9 @@ https://github.com/openai/chatkit-js
 https://github.com/better-auth/better-auth
 https://github.com/fastapi/fastapi
 https://github.com/facebook/docusaurus
+https://github.com/honojs/website
+https://github.com/honojs/hono
+https://github.com/honojs/node-server
+https://github.com/drizzle-team/drizzle-orm
+https://github.com/privatenumber/tsx
+https://github.com/brianc/node-postgres

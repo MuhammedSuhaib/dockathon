@@ -1,6 +1,6 @@
-import { pgTable, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid } from "drizzle-orm/pg-core";
 
-// --- Standard Better Auth Tables ---
+// --- 1. BETTER AUTH STANDARD TABLES ---
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -48,11 +48,27 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updatedAt")
 });
 
-// --- CRITICAL: JWKS Table for Phase 2 Guide ---
-// This stores the keys your Python backend will fetch
+// The table storing the Public/Private Key pair for JWT signing
 export const jwks = pgTable("jwks", {
-	id: text("id").primaryKey(),        // The Key ID (kid)
-	publicKey: text("publicKey").notNull(), // JSON string of public key
+	id: text("id").primaryKey(),
+	publicKey: text("publicKey").notNull(),
 	privateKey: text("privateKey").notNull(),
 	createdAt: timestamp("createdAt").notNull()
+});
+
+// --- 2. TEXTBOOK CHAT HISTORY ---
+
+export const conversations = pgTable("conversations", {
+	id: uuid("id").primaryKey().defaultRandom(),
+	user_id: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+	title: text("title"),
+	created_at: timestamp("created_at").defaultNow()
+});
+
+export const messages = pgTable("messages", {
+	id: uuid("id").primaryKey().defaultRandom(),
+	conversation_id: uuid("conversation_id").notNull().references(() => conversations.id, { onDelete: "cascade" }),
+	role: text("role").notNull(), // 'user' or 'assistant'
+	content: text("content").notNull(),
+	created_at: timestamp("created_at").defaultNow()
 });
