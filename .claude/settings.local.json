@@ -9,7 +9,10 @@
       "Bash(pnpm install)",
       "Bash(git add auth-service/)",
       "Bash(git add .gitignore)",
-      "Bash(git commit -m \"feat: add Better Auth service with sidecar architecture\n\n- Implement Node.js auth service using Better Auth\n- Create Hono server with JWKS endpoint for Python backend\n- Add database schema for users and JWT keys\n- Configure environment variables and build scripts\n- Add node_modules to gitignore\")"
+      "Bash(git commit -m \"feat: add Better Auth service with sidecar architecture\n\n- Implement Node.js auth service using Better Auth\n- Create Hono server with JWKS endpoint for Python backend\n- Add database schema for users and JWT keys\n- Configure environment variables and build scripts\n- Add node_modules to gitignore\")",
+      "Bash(curl -v http://localhost:4000/api/auth/.well-known/jwks.json)",
+      "Bash(curl -v http://localhost:4000/api/auth/)",
+      "Bash(taskkill /f /im tsx.exe)"
     ]
   }
 }
