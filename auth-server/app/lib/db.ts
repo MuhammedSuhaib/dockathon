@@ -1,3 +1,15 @@
-// This file is deprecated. Please use app/lib/auth.ts for the main auth configuration.
-// This remains here for reference purposes only.
+import { betterAuth } from "better-auth";
+import { Pool } from "pg";
 
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET!,
+  emailAndPassword: { enabled: true },
+  database: {
+    type: "postgres",
+    pool,
+  },
+});

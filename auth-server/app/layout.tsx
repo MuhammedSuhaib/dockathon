@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SpecKit-Plus Auth Server",
-  description: "Authentication server for SpecKit-Plus project",
+  title: "Components",
+  description: "Header, Hero, Footer",
 };
 
 export default async function RootLayout({
@@ -11,13 +11,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="en">
-      <body className="antialias">
+      <body>
         {children}
       </body>
     </html>
   );
 }
-
-export const runtime = "nodejs";
