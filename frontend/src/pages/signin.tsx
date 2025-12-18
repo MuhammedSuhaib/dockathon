@@ -1,11 +1,16 @@
-import { FormEvent, useState } from "react";
-import { createAuthClient } from "better-auth/client";
+import React, { FormEvent, useState } from "react";
+import BrowserOnly from "@docusaurus/BrowserOnly";
+
+export default function SigninPage() {
+  return (
+    <BrowserOnly>
+      {() => {
+        const { createAuthClient } = require("better-auth/client");
 
 const auth = createAuthClient({
   baseURL: "https://better-auth-neon-db.vercel.app",
 });
 
-export default function SigninPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
@@ -42,5 +47,8 @@ export default function SigninPage() {
 
       <button type="submit">Sign In</button>
     </form>
+        );
+      }}
+    </BrowserOnly>
   );
 }
