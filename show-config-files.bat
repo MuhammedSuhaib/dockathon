@@ -1,5 +1,4 @@
 @echo off
-echo Running code commands to open config files...
-code C:\Users\giaic\.claude-code-router\config.json
-code C:\Users\giaic\.qwen\oauth_creds.json
+echo Opening config files...
+code --reuse-window "C:\Users\%USERNAME%\.claude-code-router\config.json" "C:\Users\%USERNAME%\.qwen\oauth_creds.json"
 pause
