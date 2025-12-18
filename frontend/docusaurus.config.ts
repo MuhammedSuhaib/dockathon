@@ -89,6 +89,18 @@ const config: Config = {
           position: 'left',
           label: 'Textbook',
         },
+        // auth buttons
+        {
+          label: 'Sign in',
+          href: '/signin',
+          position: 'right',
+        },
+        {
+          label: 'Sign up',
+          href: '/signup',
+          position: 'right',
+          className: 'navbar-signup-btn',
+        },
         {
           href: 'https://github.com/MuhammedSuhaib/dockathon',
           label: 'GitHub',
