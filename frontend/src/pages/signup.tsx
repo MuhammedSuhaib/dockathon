@@ -4,6 +4,7 @@ import Layout from "@theme/Layout";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import MatrixCanvas from "@site/src/components/MatrixCanvas";
 import UserBackgroundForm from "@site/src/components/personalize";
+import { createAuthClient } from "better-auth/client";
 
 type Background = {
   software: string;
@@ -11,46 +12,12 @@ type Background = {
   goal: string;
 };
 
+const auth = createAuthClient({
+  baseURL: "https://better-auth-neon-db.vercel.app",
+});
+
 export default function SignupPage() {
   const { siteConfig } = useDocusaurusContext();
-
-  return (
-    <Layout
-      title={`Sign Up - ${siteConfig.title}`}
-      description="Create your account to get started with Physical AI & Humanoid Robotics"
-    >
-      <MatrixCanvas opacity={0.12} />
-
-      <div
-        style={{
-          position: "relative",
-          zIndex: 10,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "80vh",
-          padding: "20px",
-          color: "white"
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "400px",
-            padding: "2rem",
-            borderRadius: "8px",
-            backgroundColor: "rgba(30, 30, 30, 0.9)",
-            boxShadow: "0 0 20px rgba(0, 255, 65, 0.3)",
-            backdropFilter: "blur(10px)"
-          }}
-        >
-          <BrowserOnly>
-            {() => {
-              const { createAuthClient } = require("better-auth/client");
-
-              const auth = createAuthClient({
-                baseURL: "https://better-auth-neon-db.vercel.app",
-              });
 
               const [name, setName] = useState<string>("");
               const [email, setEmail] = useState<string>("");
@@ -85,27 +52,58 @@ export default function SignupPage() {
                 if (res?.error) {
                   setError(res.error.message || "Signup failed");
                   setLoading(false);
-                  console.error(res.error);
                   return;
                 }
-
-                // Save metadata in Better Auth
-                try {
-                  await auth.updateUser({
-                    metadata: {
-                      name,
-                      background: bg,
-                    },
-                  });
-                } catch (err) {
-                  console.error("Failed to save user metadata:", err);
+              await fetch(
+                "https://better-auth-neon-db.vercel.app/api/user-background",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({
+                    data: [
+                      { q: "software", a: bg.software },
+                      { q: "hardware", a: bg.hardware },
+                      { q: "goal", a: bg.goal },
+                    ],
+                  }),
                 }
-
-                // Redirect to documentation page after successful signup
+              );
                 window.location.href = "/SpecKit-Plus/docs/module-01-robotic-nervous-system/intro";
               };
 
               return (
+                <Layout
+                  title={`Sign Up - ${siteConfig.title}`}
+                  description="Create your account to get started with Physical AI & Humanoid Robotics"
+                >
+                  <MatrixCanvas opacity={0.12} />
+
+                  <div
+                    style={{
+                      position: "relative",
+                      zIndex: 10,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      minHeight: "80vh",
+                      padding: "20px",
+                      color: "white",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        maxWidth: "400px",
+                        padding: "2rem",
+                        borderRadius: "8px",
+                        backgroundColor: "rgba(30, 30, 30, 0.9)",
+                        boxShadow: "0 0 20px rgba(0, 255, 65, 0.3)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      <BrowserOnly>
+                        {() => (
                 <div>
                   <h1
                     style={{
@@ -275,8 +273,7 @@ export default function SignupPage() {
                     </button>
                   </form>
                 </div>
-              );
-            }}
+            )}
           </BrowserOnly>
         </div>
       </div>

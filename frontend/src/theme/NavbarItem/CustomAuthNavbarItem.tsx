@@ -14,6 +14,8 @@ type Session = {
 
 const auth = createAuthClient({
   baseURL: 'https://better-auth-neon-db.vercel.app',
+  fetch: (url, options) =>
+  fetch(url, { ...options, credentials: 'include' }), // ✅ ONLY change
 });
 
 /* ---------- Authenticated ---------- */

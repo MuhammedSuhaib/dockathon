@@ -388,8 +388,7 @@ const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded 
           </button>
         </form>
       </div>
-
-      <style jsx>{`
+      <style>{`
         .blink-caret { animation: blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }

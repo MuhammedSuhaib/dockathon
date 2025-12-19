@@ -90,7 +90,7 @@ const FloatingChatWidget = () => {
         </button>
       )}
 
-      <style jsx>{`
+      <style>{`
         /* --- Themes --- */
         .floating-chat-widget {
           --bg-dark: #050a07;
