@@ -102,7 +102,7 @@ export default function SignupPage() {
                 }
 
                 // Redirect to documentation page after successful signup
-                window.location.href = "/docs/module-01-robotic-nervous-system/intro";
+                window.location.href = "/SpecKit-Plus/docs/module-01-robotic-nervous-system/intro";
               };
 
               return (

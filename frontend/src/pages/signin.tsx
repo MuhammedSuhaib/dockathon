@@ -47,10 +47,30 @@ export default function SigninPage() {
 
               const [email, setEmail] = useState<string>("");
               const [password, setPassword] = useState<string>("");
+              const [loading, setLoading] = useState<boolean>(false);
+              const [error, setError] = useState<string | null>(null);
 
               const submit = async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
-                await auth.signIn.email({ email, password });
+                setLoading(true);
+                setError(null);
+
+                try {
+                  const res = await auth.signIn.email({ email, password });
+
+                  if (res?.error) {
+                    setError(res.error.message || "Sign in failed");
+                    setLoading(false);
+                    return;
+                  }
+
+                  // Redirect to documentation page after successful signin
+                  window.location.href = "/SpecKit-Plus/docs/module-01-robotic-nervous-system/intro";
+                } catch (err) {
+                  setError("Sign in failed. Please try again.");
+                  setLoading(false);
+                  console.error("Sign in error:", err);
+                }
               };
 
               return (
@@ -66,6 +86,20 @@ export default function SigninPage() {
                   >
                     Sign In
                   </h1>
+                  {error && (
+                    <div
+                      style={{
+                        color: "#ff4d4d",
+                        backgroundColor: "rgba(255, 77, 77, 0.1)",
+                        padding: "0.75rem",
+                        borderRadius: "4px",
+                        marginBottom: "1rem",
+                        border: "1px solid #ff4d4d",
+                      }}
+                    >
+                      {error}
+                    </div>
+                  )}
                   <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div>
                       <label
@@ -133,8 +167,9 @@ export default function SigninPage() {
 
                     <button
                       type="submit"
+                      disabled={loading}
                       style={{
-                        backgroundColor: "#00cc44",
+                        backgroundColor: loading ? "#009933" : "#00cc44",
                         borderColor: "#00cc44",
                         color: "white",
                         padding: "0.75rem 1.5rem",
@@ -142,22 +177,24 @@ export default function SigninPage() {
                         textDecoration: "none",
                         borderRadius: "4px",
                         border: "none",
-                        cursor: "pointer",
+                        cursor: loading ? "not-allowed" : "pointer",
                         transition: "all 0.3s ease",
                         marginTop: "1rem"
                       }}
                       onMouseOver={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = "#00ff41";
-                        target.style.boxShadow = "0 0 15px rgba(0, 255, 65, 0.5)";
+                        if (!loading) {
+                          const target = e.target as HTMLButtonElement;
+                          target.style.backgroundColor = "#00ff41";
+                          target.style.boxShadow = "0 0 15px rgba(0, 255, 65, 0.5)";
+                        }
                       }}
                       onMouseOut={(e) => {
                         const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = "#00cc44";
+                        target.style.backgroundColor = loading ? "#009933" : "#00cc44";
                         target.style.boxShadow = "none";
                       }}
                     >
-                      Sign In
+                      {loading ? "Signing In..." : "Sign In"}
                     </button>
                   </form>
                 </div>

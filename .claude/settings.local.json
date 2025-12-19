@@ -19,7 +19,8 @@
       "Bash(git add frontend/src/components/SignupModal.tsx frontend/src/components/AuthComponent.jsx backend/database.py backend/main.py specs/signup-flow-spec.md history/prompts/general/1765945861-signup-flow-implementation.general.prompt.md)",
       "Bash(git commit -m \"feat: implement complete signup flow with modal and database integration\n\n- Create SignupModal component with personalize form integration\n- Update AuthComponent to use modal popup instead of prompts\n- Add user_profiles table to database with background information\n- Create API endpoint to save user background to Neon database\n- Connect Docusaurus navbar auth buttons to Next.js auth system\n- Implement complete flow: navbar → modal → auth → database → home\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\")",
       "Bash(npm run build)",
-      "Bash(git checkout HEAD -- \"D:\\VScode\\GitHub\\SpecKit-Plus\\auth-server\\app\\page.tsx\")"
+      "Bash(git checkout HEAD -- \"D:\\VScode\\GitHub\\SpecKit-Plus\\auth-server\\app\\page.tsx\")",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)"
     ]
   }
 }
