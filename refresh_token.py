@@ -64,7 +64,3 @@ except subprocess.CalledProcessError as e:
     log_message(f"❌ Error: Failed to run 'ccr restart'. Ensure 'ccr' is in your system PATH. Output: {e.stderr}")
 except Exception as e:
     log_message(f"❌ An unexpected error occurred: {e}")
-
-
-# code C:\Users\giaic\.claude-code-router\config.json
-# code C:\Users\giaic\.qwen\oauth_creds.json

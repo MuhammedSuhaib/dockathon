@@ -208,3 +208,5 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+- the correct command is pnpm add , also uv run ..., uv add ...
+- we are in windows normally so sometime your linux commands won`t work here if i moved back to bookworm so i`ll let u know
