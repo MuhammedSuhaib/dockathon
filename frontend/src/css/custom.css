@@ -221,3 +221,11 @@ canvas[style*="fixed"] {
   position: relative;
   z-index: 1;
 }
+
+.navbar-signup-btn {
+  background: #22c55e;
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}

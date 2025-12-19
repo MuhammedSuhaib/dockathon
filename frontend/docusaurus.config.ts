@@ -91,15 +91,8 @@ const config: Config = {
         },
         // auth buttons
         {
-          label: 'Sign in',
-          href: '/signin',
+          type: 'custom-auth',
           position: 'right',
-        },
-        {
-          label: 'Sign up',
-          href: '/signup',
-          position: 'right',
-          className: 'navbar-signup-btn',
         },
         {
           href: 'https://github.com/MuhammedSuhaib/dockathon',
