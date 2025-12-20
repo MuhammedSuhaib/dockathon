@@ -64,6 +64,16 @@ export default function SigninPage() {
                     return;
                   }
 
+                  // The signIn response should contain the session
+                  // Store the user's name in localStorage for the navbar immediately
+                  const userName = res.data?.session?.user?.name ||
+                                  res.data?.session?.user?.email?.split('@')[0] ||
+                                  'User';
+                  localStorage.setItem('userName', userName);
+
+                  // Store session in localStorage for faster access
+                  localStorage.setItem('better-auth-session', JSON.stringify(res.data));
+
                   // Redirect to documentation page after successful signin
                   window.location.href = "/SpecKit-Plus/docs/module-01-robotic-nervous-system/intro";
                 } catch (err) {

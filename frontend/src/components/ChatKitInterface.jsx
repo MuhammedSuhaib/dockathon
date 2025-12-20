@@ -92,15 +92,25 @@ const SourceDropdown = ({ sources }) => {
 };
 
 const ChatKitInterface = ({ conversationId = 'default-conversation', isEmbedded = false }) => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: `Hello! I'm your AI assistant for the Physical AI & Humanoid Robotics textbook.`,
-      sender: 'bot',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      sources: []
-    }
-  ]);
+  const [messages, setMessages] = useState(() => {
+    const storedName = typeof window !== 'undefined' ? localStorage.getItem('userName') : null;
+    const userName = storedName ? storedName : 'User';
+    return [
+      {
+        id: 1,
+        text:  <>
+        Hello{' '}
+        <span style={{ color: '#00ff41', fontWeight: 'bold' }}>
+          {userName}
+        </span>
+      ! I'm your AI assistant for the Physical AI & Humanoid Robotics textbook.
+        </>,
+        sender: 'bot',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sources: []
+      }
+    ];
+  });
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [stagedSelection, setStagedSelection] = useState(null);

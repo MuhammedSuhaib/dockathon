@@ -54,21 +54,51 @@ export default function SignupPage() {
                   setLoading(false);
                   return;
                 }
-              await fetch(
+
+                // Store the user's name in local storage
+                localStorage.setItem('userName', name);
+
+                // Store Q/As in localStorage first along with email and name
+                const personalizationData = [
+                  { q: "Software Skill Level", a: bg.software, category: "Skills" },
+                  { q: "Hardware Access", a: bg.hardware, category: "Equipment" },
+                  { q: "Primary Goal", a: bg.goal, category: "Goals" },
+                ];
+
+                // Save to localStorage with email and name
+                const localData = {
+                  email: email,
+                  name: name,
+                  questions: personalizationData,
+                  timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('user-personalization', JSON.stringify(localData));
+
+                // Save personalization data to database with categories
+                const response = await fetch(
                 "https://better-auth-neon-db.vercel.app/api/user-background",
                 {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   credentials: "include",
                   body: JSON.stringify({
-                    data: [
-                      { q: "software", a: bg.software },
-                      { q: "hardware", a: bg.hardware },
-                      { q: "goal", a: bg.goal },
-                    ],
+                    data: personalizationData,
                   }),
                 }
               );
+
+                // Store the user's name in localStorage for the navbar immediately after signup
+                localStorage.setItem('userName', name);
+
+                if (response.ok) {
+                  // Store session in localStorage for faster access
+                  const sessionResponse = await auth.getSession();
+                  if (sessionResponse?.data?.session) {
+                    localStorage.setItem('better-auth-session', JSON.stringify(sessionResponse.data));
+                  }
+                }
+
                 window.location.href = "/SpecKit-Plus/docs/module-01-robotic-nervous-system/intro";
               };
 
