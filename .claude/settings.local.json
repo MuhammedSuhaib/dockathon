@@ -24,7 +24,8 @@
       "Bash(dir \"D:\\VScode\\GitHub\\SpecKit-Plus\\backend\" /s)",
       "Bash(findstr -i \"schema\\|model\\|migration\\|sql\")",
       "Bash(powershell \"Get-ChildItem -Path ''D:\\VScode\\GitHub\\SpecKit-Plus\\backend'' -Recurse | Where-Object { $_Name -match ''schema|model|migration|sql'' }\")",
-      "Bash(powershell \"Get-ChildItem -Path ''D:\\VScode\\GitHub\\SpecKit-Plus'' -Recurse -Filter ''*.py'' | Select-String -Pattern ''database\\|user_background\\|CREATE TABLE'' | Select-Object Path, LineNumber, Line\")"
+      "Bash(powershell \"Get-ChildItem -Path ''D:\\VScode\\GitHub\\SpecKit-Plus'' -Recurse -Filter ''*.py'' | Select-String -Pattern ''database\\|user_background\\|CREATE TABLE'' | Select-Object Path, LineNumber, Line\")",
+      "Bash(git add README.md)"
     ]
   }
 }

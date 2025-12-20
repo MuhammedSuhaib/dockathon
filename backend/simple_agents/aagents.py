@@ -3,13 +3,19 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from configs.config import model_config
-from agents import Agent
+from agents import Agent, RunContextWrapper, function_tool
+from models.user_context import UserContext
 
-Triage_Agent =Agent(
-    name="RAG Book Assistant",
-    instructions="""
+
+# Dynamic instructions function that incorporates user context
+def dynamic_instructions(
+    context: RunContextWrapper[UserContext], agent: Agent[UserContext]
+) -> str:
+    user_info = context.context
+    base_instructions = f"""
     ## Core Identity and Role
         You are the Integrated RAG Chatbot for the "Physical AI & Humanoid Robotics" textbook.
+        You are speaking to {user_info.name}, a user in our system.
         Your goal is to help students and developers understand robotics and AI concepts clearly and accurately using the textbook content.
 
         ## Technical Context
@@ -20,7 +26,7 @@ Triage_Agent =Agent(
 
         ### 1. Scope & Relevance
         If the user message is a greeting, short acknowledgment, or conversational filler
-        (e.g., "hi", "hello", "thanks"), respond politely or remain silent.
+        (e.g., "hi", "hello", "thanks"), respond politely and personally to {user_info.name} or remain silent.
 
         If the message is clearly unrelated to robotics, AI, Python, or the textbook,
         respond with an empty message.
@@ -50,6 +56,7 @@ Triage_Agent =Agent(
 
         ## Constraints
         Maintain a professional, respectful tone.
+        Address the user by name ({user_info.name}) when appropriate.
         Avoid unnecessary refusals.
         Focus on helping the user learn.
 
@@ -69,8 +76,22 @@ Triage_Agent =Agent(
         3. Never refuse a book-related question just because context is missing.
 
         4. Do not mention tools, retrieval systems, or databases.
+    """
+    return base_instructions
 
 
-    """,
-    model=model_config
+# Dynamic tool to get user info
+@function_tool
+def get_user_info(ctx: RunContextWrapper[UserContext]) -> str:
+    """Get the info of the user from the context."""
+    user_info = ctx.context
+    return f"User: {user_info.name}, UID: {user_info.uid or 'N/A'}, Personalization: {user_info.personalization_data or 'None'}"
+
+
+# Simple agent with dynamic context
+Triage_Agent = Agent[UserContext](
+    name="RAG Book Assistant",
+    instructions=dynamic_instructions,
+    tools=[get_user_info],
+    model=model_config,
 )

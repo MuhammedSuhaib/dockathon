@@ -1,8 +1,10 @@
 import logging
+from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from agents import Runner
 from simple_agents.aagents import Triage_Agent
+from models.user_context import UserContext
 from pydantic import BaseModel
 from services.rag import RAGService
 from data.vector_store import VectorStore
@@ -39,11 +41,13 @@ app.add_middleware(
 # Matches the payload for the general chat endpoint (/api/query)
 class QueryRequest(BaseModel):
     query: str
+    user_context: Optional[dict] = None
 
 # Matches the payload for the selection endpoint (/api/selection)
 class SelectionRequest(BaseModel):
     selected_text: str
     question: str
+    user_context: Optional[dict] = None
 
 # Matches the payload for the translation endpoint (/api/translate-text)
 class TranslationRequest(BaseModel):
@@ -71,6 +75,16 @@ async def handle_query(req: QueryRequest):
             "sources": []
         }
 
+    # Create user context from request data
+    user_context_data = req.user_context or {}
+    user_context = UserContext(
+        name=user_context_data.get('name', 'User'),
+        uid=user_context_data.get('uid'),
+        email=user_context_data.get('email'),
+        personalization_data=user_context_data.get('personalization_data'),
+        session_id=user_context_data.get('session_id')
+    )
+
     # Use global RAG service to get context from Qdrant
     # Get relevant context from Qdrant
     try:
@@ -90,10 +104,11 @@ async def handle_query(req: QueryRequest):
     else:
         enhanced_query = req.query
 
-    # Run the main agent with the enhanced query
+    # Run the main agent with the enhanced query and user context
     result = await Runner.run(
         Triage_Agent,
-        enhanced_query
+        enhanced_query,
+        context=user_context
     )
 
     # CRITICAL: Response structure must match React component: {"answer": "...", "sources": []}
@@ -106,6 +121,16 @@ async def handle_query(req: QueryRequest):
 async def handle_selection(req: SelectionRequest):
     """Handles queries based on selected text (RAG context)."""
     logging.info(f"Received selection query. Question: {req.question}")
+
+    # Create user context from request data
+    user_context_data = req.user_context or {}
+    user_context = UserContext(
+        name=user_context_data.get('name', 'User'),
+        uid=user_context_data.get('uid'),
+        email=user_context_data.get('email'),
+        personalization_data=user_context_data.get('personalization_data'),
+        session_id=user_context_data.get('session_id')
+    )
 
     # Check if services are properly initialized
     if not rag_service or not vector_store:
@@ -141,10 +166,11 @@ async def handle_selection(req: SelectionRequest):
             f"Context: \"{req.selected_text}\" "
             f"Question: {req.question}"
         )
-    # Run the agent with the context-aware prompt
+    # Run the agent with the context-aware prompt and user context
     result = await Runner.run(
         Triage_Agent,
-        prompt
+        prompt,
+        context=user_context
     )
 
     # CRITICAL: Response structure must match React component: {"answer": "...", "sources": []}
