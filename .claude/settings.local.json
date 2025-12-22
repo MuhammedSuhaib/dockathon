@@ -1,31 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls -la backend/README*)",
-      "Bash(git checkout -b 004-better-auth-implementation)",
+      "Bash(ls -la *)",
       "Bash(qwen)",
       "Bash(pnpm init:*)",
-      "Bash(pnpm add better-auth hono pg dotenv)",
+      "Bash(pnpm add *)",
       "Bash(pnpm install)",
-      "Bash(git add auth-service/)",
-      "Bash(git add .gitignore)",
-      "Bash(git commit -m \"feat: add Better Auth service with sidecar architecture\n\n- Implement Node.js auth service using Better Auth\n- Create Hono server with JWKS endpoint for Python backend\n- Add database schema for users and JWT keys\n- Configure environment variables and build scripts\n- Add node_modules to gitignore\")",
-      "Bash(curl -v http://localhost:4000/api/auth/.well-known/jwks.json)",
-      "Bash(curl -v http://localhost:4000/api/auth/)",
+      "Bash(git add .)",
+      "Bash(curl -v *)",
       "Bash(taskkill /f /im tsx.exe)",
       "Bash(dir \"D:\\VScode\\GitHub\\SpecKit-Plus\")",
       "Bash(powershell Get-ChildItem -Path \"D:\\VScode\\GitHub\\SpecKit-Plus\\auth-server\\app\\api\\auth\" -Recurse)",
       "Bash(powershell \"Get-Content -Path ''D:\\VScode\\GitHub\\SpecKit-Plus\\auth-server\\app\\api\\auth\\[...betterauth]\\route.ts''\")",
-      "Bash(git add frontend/src/components/SignupModal.tsx frontend/src/components/AuthComponent.jsx backend/database.py backend/main.py specs/signup-flow-spec.md history/prompts/general/1765945861-signup-flow-implementation.general.prompt.md)",
-      "Bash(git commit -m \"feat: implement complete signup flow with modal and database integration\n\n- Create SignupModal component with personalize form integration\n- Update AuthComponent to use modal popup instead of prompts\n- Add user_profiles table to database with background information\n- Create API endpoint to save user background to Neon database\n- Connect Docusaurus navbar auth buttons to Next.js auth system\n- Implement complete flow: navbar → modal → auth → database → home\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\")",
       "Bash(npm run build)",
-      "Bash(git checkout HEAD -- \"D:\\VScode\\GitHub\\SpecKit-Plus\\auth-server\\app\\page.tsx\")",
       "Bash(.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
       "Bash(dir \"D:\\VScode\\GitHub\\SpecKit-Plus\\backend\" /s)",
       "Bash(findstr -i \"schema\\|model\\|migration\\|sql\")",
       "Bash(powershell \"Get-ChildItem -Path ''D:\\VScode\\GitHub\\SpecKit-Plus\\backend'' -Recurse | Where-Object { $_Name -match ''schema|model|migration|sql'' }\")",
-      "Bash(powershell \"Get-ChildItem -Path ''D:\\VScode\\GitHub\\SpecKit-Plus'' -Recurse -Filter ''*.py'' | Select-String -Pattern ''database\\|user_background\\|CREATE TABLE'' | Select-Object Path, LineNumber, Line\")",
-      "Bash(git add README.md)"
+      "Bash(powershell \"Get-ChildItem -Path ''D:\\VScode\\GitHub\\SpecKit-Plus'' -Recurse -Filter ''*.py'' | Select-String -Pattern ''database\\|user_background\\|CREATE TABLE'' | Select-Object Path, LineNumber, Line\")"
     ]
   }
 }

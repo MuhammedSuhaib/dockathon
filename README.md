@@ -40,7 +40,7 @@ The textbook platform follows a modern microservices architecture:
 
 - **Frontend**: Docusaurus static site generator with React components
 - **Backend**: FastAPI application with asynchronous processing
-- **Database**: Neon Serverless Postgres for conversation storage
+- **Database**: Neon Serverless Postgres
 - **Vector Store**: Qdrant Cloud for semantic search capabilities
 - **Authentication**: Better-auth for secure user management
 - **Translation**: Integrated translation services API
@@ -116,10 +116,6 @@ The textbook platform follows a modern microservices architecture:
 - `POST /api/selection` - Query based on selected text only
 - `POST /api/conversations` - Create new conversations (planned feature)
 - `GET /api/conversations/{conversation_id}` - Retrieve conversation history (planned feature)
-
-## Contributing
-
-We welcome contributions to the textbook! Please see our contribution guidelines in the `.specify` directory.
 
 ## AI Orchestration & Development Tools
 
